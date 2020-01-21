@@ -29,7 +29,7 @@
 // MicroOLED Definition //
 //////////////////////////
 //The library assumes a reset pin is necessary. The Qwiic OLED has RST hard-wired, so pick an arbitrarty IO pin that is not being used
-#define PIN_RESET 9
+#define PIN_RESET 13
 //The DC_JUMPER is the I2C Address Select jumper. Set to 1 if the jumper is open (Default), or set to 0 if it's closed.
 #define DC_JUMPER 1
 
@@ -42,8 +42,10 @@ MicroOLED oled(PIN_RESET, DC_JUMPER);    // I2C declaration
 
 void setup()
 {
+  Serial.begin(9600);
   delay(100);
-  Wire.begin();
+  Wire.begin(23, 22);
+  Wire.setClock(400*1000);
   oled.begin();    // Initialize the OLED
   oled.clear(ALL); // Clear the display's internal memory
   oled.display();  // Display what's in the buffer (splashscreen)
@@ -51,6 +53,8 @@ void setup()
   oled.clear(PAGE); // Clear the buffer.
   
   //randomSeed(analogRead(A0) + analogRead(A1));
+
+  pinMode(13, OUTPUT);
 }
 
 void pixelExample()
@@ -293,8 +297,15 @@ void textExamples()
   }
 }
 
+bool blink = false;
+
 void loop()
 {
+  digitalWrite(13, blink ? HIGH : LOW);
+  blink = !blink;
+
+  Serial.printf("Hello, world! (%zu sec)\n", static_cast<size_t>(millis()));
+
   //pixelExample();  // Run the pixel example function
   lineExample();   // Then the line example function
   shapeExample();  // Then the shape example
