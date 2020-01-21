@@ -8,6 +8,6 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  Serial.print("hello\n");
+  Serial.printf("Hello, world! (%zu sec)\n", static_cast<size_t>(millis()));
   delay(1000);
 }
