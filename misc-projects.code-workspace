@@ -26,6 +26,14 @@
 		{
 			"name": "espthing-blink",
 			"path": "espthing-blink"
+		},
+		{
+			"name": "metroM4 AVR ISP",
+			"path": "metroM4 AVR ISP"
+		},
+		{
+			"name": "attiny85 blink",
+			"path": "attiny85 blink"
 		}
 	],
 	"settings": {}
