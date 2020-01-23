@@ -1,0 +1,32 @@
+{
+	"folders": [
+		{
+			"path": "blink metrom0"
+		},
+		{
+			"name": "wemos esp32 oled",
+			"path": "wemos esp32 oled"
+		},
+		{
+			"name": "sticky particles",
+			"path": "sticky particles"
+		},
+		{
+			"name": "trinketm0-meter",
+			"path": "trinketm0-meter"
+		},
+		{
+			"name": "plant pump",
+			"path": "plant pump"
+		},
+		{
+			"name": "SparkfunEsp32ThingPlusDemo",
+			"path": "SparkfunEsp32ThingPlusDemo"
+		},
+		{
+			"name": "espthing-blink",
+			"path": "espthing-blink"
+		}
+	],
+	"settings": {}
+}
