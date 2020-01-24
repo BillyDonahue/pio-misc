@@ -34,6 +34,10 @@
 		{
 			"name": "attiny85 blink",
 			"path": "attiny85 blink"
+		},
+		{
+			"name": "uno-servo-test",
+			"path": "uno-servo-test"
 		}
 	],
 	"settings": {}
