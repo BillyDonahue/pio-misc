@@ -38,6 +38,9 @@
 		{
 			"name": "uno-servo-test",
 			"path": "uno-servo-test"
+		},
+		{
+			"path": "metro-m0-servo-test"
 		}
 	],
 	"settings": {}

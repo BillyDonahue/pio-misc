@@ -2,8 +2,6 @@
 #include <Wire.h>
 #include <Adafruit_DotStar.h>
 
-static const float pi = 3.14159;
-
 Adafruit_DotStar strip(1, INTERNAL_DS_DATA, INTERNAL_DS_CLK, DOTSTAR_BGR);
 
 int blink = 0;
@@ -12,6 +10,7 @@ void setup() {
   pinMode(A0, INPUT);
   pinMode(A3, INPUT);
   pinMode(13, OUTPUT);
+  pinMode(4, OUTPUT);
 
   Serial.begin(9600);
 
@@ -22,30 +21,20 @@ void setup() {
 
 int tol = 50;  // 5.0%
 
+ulong lastDispensed = 0;
+
+void dispenseWater() {
+  unsigned long dur = 2 * 1000;
+  Serial.printf("(dispensing water for %lu msec)\n", dur);
+
+  // pump is on pin4.  10sec of watering.
+  digitalWrite(4, HIGH);
+  delay(dur);
+  digitalWrite(4, LOW);
+}
+
 void loop() {
-
-  for (int i = 0; 0; ++i) {
-    switch(i%5){
-      case 1:
-        strip.setPixelColor(0, strip.Color(0x88, 0, 0));
-        break;
-      case 2:
-        strip.setPixelColor(0, strip.Color(0, 0x88, 0));
-        break;
-      case 3:
-        strip.setPixelColor(0, strip.Color(0, 0, 0x88));
-        break;
-      default:
-        strip.setPixelColor(0, strip.Color(0, 0, 0));
-        break;
-
-    }
-      strip.show();
-      delay(1000);
-  }
-
-
-  {
+  if (0) {
     uint32_t b = LOW;
     if (++blink>=3) {
       b = HIGH;
@@ -54,8 +43,18 @@ void loop() {
     digitalWrite(13, b);
   }
 
-  int wet = map(analogRead(A0), 0, 1024, 1000, 0);
-  int pot = map(analogRead(A3), 0, 1024, 0, 1000);
+  uint32_t rawWet = analogRead(A0);
+  uint32_t rawPot = analogRead(A3);
+  Serial.printf("(rawWet=%" PRIu32 ", rawPot=%" PRIu32 ")\n", rawWet, rawPot);
+
+
+
+  // calibration:
+  static const uint32_t kDryAir = 885;
+  static const uint32_t kWater = 466;
+
+  int wet = map(rawWet, kWater, kDryAir, 1000, 0);
+  int pot = map(rawPot, 0, 1024, 0, 1000);
   int err = pot - wet;
   if (err > tol) {
       // too dry
@@ -72,5 +71,15 @@ void loop() {
   }
   strip.show();
   Serial.printf("(wet=.%03d, pot=.%03d) err=%d\n", wet, pot, err);
+
+  if (err > tol) {
+    // too dry! Start the pump if we haven't done so too recently.
+    auto t = millis();
+    if (t - lastDispensed > 1000 * 10) {
+      dispenseWater();
+      lastDispensed = t;
+    }
+  }
+
   delay(1000);
 }
