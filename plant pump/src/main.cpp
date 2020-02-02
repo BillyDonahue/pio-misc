@@ -22,7 +22,7 @@ const unsigned long kDispenseWait = 30;
 
 // Can only enter watering cycle a few times per day.
 // Let's say every 4 hours.
-const unsigned long kMinWateringCyclePeriod = 4*60*60;
+const unsigned long kMinWateringCyclePeriod = 0; // 4*60*60;
 
 // calibration:
 const uint32_t kDryAir = 885;
