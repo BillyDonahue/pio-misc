@@ -20,11 +20,13 @@ void setup() {
 }
 
 int tol = 50;  // 5.0%
+static const unsigned long kDispenseSec = 10;
+static const unsigned long kDispenseWait = 30;
 
 ulong lastDispensed = 0;
 
 void dispenseWater() {
-  unsigned long dur = 2 * 1000;
+  unsigned long dur = kDispenseSec * 1000;
   Serial.printf("(dispensing water for %lu msec)\n", dur);
 
   // pump is on pin4.  10sec of watering.
@@ -75,7 +77,7 @@ void loop() {
   if (err > tol) {
     // too dry! Start the pump if we haven't done so too recently.
     auto t = millis();
-    if (t - lastDispensed > 1000 * 10) {
+    if (t - lastDispensed > kDispenseWait * 1000) {
       dispenseWater();
       lastDispensed = t;
     }
