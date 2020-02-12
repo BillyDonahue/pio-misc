@@ -11,6 +11,11 @@ static const auto yellow = strip.Color(0x44, 0x44, 0);
 static const auto white = strip.Color(0x44, 0x44, 0x44);
 static const auto black = strip.Color(0, 0, 0);
 
+static const int kPinPump = 4;
+static const int kPinLed = 13;
+static const int kPinWet = A0;
+static const int kPinPot = A3;
+
 void setColor(uint32_t c) {
   strip.setPixelColor(0, c);
   strip.show();
@@ -28,7 +33,6 @@ const unsigned long kMinWateringCyclePeriod = 0; // 4*60*60;
 const uint32_t kDryAir = 885;
 const uint32_t kWater = 466;
 
-
 ulong lastDispensed = 0;  // ts msec
 
 // In watering cycle currently.
@@ -41,19 +45,19 @@ void dispenseWater() {
 
   // pump is on pin4.  10sec of watering.
   setColor(white);
-  digitalWrite(13,HIGH);
-  digitalWrite(4, HIGH);
+  digitalWrite(kPinLed,HIGH);
+  digitalWrite(kPinPump, HIGH);
   delay(dur);
-  digitalWrite(4, LOW);
-  digitalWrite(13,LOW);
+  digitalWrite(kPinPump, LOW);
+  digitalWrite(kPinLed,LOW);
   setColor(black);
 }
 
 void setup() {
-  pinMode(A0, INPUT);
-  pinMode(A3, INPUT);
-  pinMode(13, OUTPUT);
-  pinMode(4, OUTPUT);
+  pinMode(kPinWet, INPUT);
+  pinMode(kPinPot, INPUT);
+  pinMode(kPinLed, OUTPUT);
+  pinMode(kPinPump, OUTPUT);
   Serial.begin(9600);
   strip.begin(); // Initialize pins for output
   strip.setBrightness(40);
@@ -61,8 +65,8 @@ void setup() {
 }
 
 void loop() {
-  uint32_t rawWet = analogRead(A0);
-  uint32_t rawPot = analogRead(A3);
+  uint32_t rawWet = analogRead(kPinWet);
+  uint32_t rawPot = analogRead(kPinPot);
   Serial.printf("(rawWet=%" PRIu32 ", rawPot=%" PRIu32 ")\n", rawWet, rawPot);
 
   int wet = map(rawWet, kWater, kDryAir, 1000, 0);
@@ -76,16 +80,18 @@ void loop() {
         watering = true;
         lastWateringCycle = t;
       }
-  } else if (err < -kTol) {
-    // too wet
-    setColor(blue);
-  } else if (err > kTol/2) {
+  } else if (err > kTol / 2) {
     // almost too dry: yellow alert
     setColor(yellow);
   } else {
-    // ok
-    setColor(green);
     watering = false;
+    if (err < -kTol) {
+      // too wet
+      setColor(blue);
+    } else {
+      // ok
+      setColor(green);
+    }
   }
   Serial.printf("(wet=.%03d, pot=.%03d) err=%d\n", wet, pot, err);
 
